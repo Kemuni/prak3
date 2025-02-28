@@ -61,21 +61,21 @@ app.get('/categories', (req, res) => {
 
 // Создать новый объект
 app.post('/products', (req, res) => {
-    const { name, price, description, categoryId } = req.body;
+    const { name, price, description, categoryIds } = req.body;
     const newProduct = {
         id: 0,
         name: name,
         price: price,
         description: description,
-        categoryId: categoryId,
+        categoryIds: categoryIds,
     };
     fs.readFile('./data.json', 'utf-8', function(err, data) {
         if (err) throw err
 
         let jsonData = JSON.parse(data);
-        const category = jsonData.categories.find(t => parseInt(t.id) === parseInt(categoryId));
-        if (category === undefined) {
+        if (categoryIds.some((el) => jsonData.categories.find(t => parseInt(t.id) === parseInt(el)) === undefined)) {
             res.status(404).json({ message: 'Category not found.' });
+            return;
         }
         newProduct.id = jsonData.products.length + 1;
         jsonData.products.push(newProduct);
@@ -113,13 +113,12 @@ app.put('/products/:id', (req, res) => {
         let jsonData = JSON.parse(data);
         const product = jsonData.products.find(t => t.id === productId);
         if (product) {
-            const { name, price, description, categoryId } = req.body;
+            const { name, price, description, categoryIds } = req.body;
             product.name = name !== undefined ? name : product.title;
             product.price = price !== undefined ? price : product.price;
             product.description = description !== undefined ? description : product.description;
-            product.categoryId = categoryId !== undefined ? categoryId : product.categoryId;
-            const category = jsonData.categories.find(t => parseInt(t.id) === parseInt(categoryId));
-            if (category === undefined) {
+            product.categoryIds = categoryIds !== undefined ? categoryIds : product.categoryIds;
+            if (categoryIds.every((el) => jsonData.categories.find(t => parseInt(t.id) === parseInt(el)) !== undefined)) {
                 res.status(404).json({ message: 'Category not found.' });
             }
             fs.writeFile('./data.json', JSON.stringify(jsonData), 'utf-8', function(err) {

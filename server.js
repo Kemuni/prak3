@@ -53,11 +53,13 @@ app.get('/products', (req, res) => {
 
         let result = {};
         for (const product of jsonData.products) {
-            let categoryName = categoryIdToName[product.categoryId];
-            if (result.hasOwnProperty(categoryName)) {
-                result[categoryName].push(product);
-            } else {
-                result[categoryName] = [product];
+            for (const categoryId of product.categoryIds) {
+                let categoryName = categoryIdToName[categoryId];
+                if (result.hasOwnProperty(categoryName)) {
+                    result[categoryName].push(product);
+                } else {
+                    result[categoryName] = [product];
+                }
             }
         }
         res.json(result);
