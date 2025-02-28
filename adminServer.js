@@ -172,7 +172,7 @@ app.delete('/categories/:id', (req, res) => {
         if (err) throw err
 
         let jsonData = JSON.parse(data);
-        jsonData.products = jsonData.products.filter(t => parseInt(t.categoryId) !== categoryId);
+        jsonData.products = jsonData.products.filter(t => !t.categoryIds.includes(categoryId));
         jsonData.categories = jsonData.categories.filter(t => t.id !== categoryId);
         fs.writeFile('./data.json', JSON.stringify(jsonData), 'utf-8', function(err) {
             if (err) throw err;
