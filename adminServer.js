@@ -118,8 +118,9 @@ app.put('/products/:id', (req, res) => {
             product.price = price !== undefined ? price : product.price;
             product.description = description !== undefined ? description : product.description;
             product.categoryIds = categoryIds !== undefined ? categoryIds : product.categoryIds;
-            if (categoryIds.every((el) => jsonData.categories.find(t => parseInt(t.id) === parseInt(el)) !== undefined)) {
+            if (categoryIds.some((el) => jsonData.categories.find(t => parseInt(t.id) === parseInt(el)) === undefined)) {
                 res.status(404).json({ message: 'Category not found.' });
+                return;
             }
             fs.writeFile('./data.json', JSON.stringify(jsonData), 'utf-8', function(err) {
                 if (err) throw err;
